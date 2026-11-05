@@ -4,9 +4,10 @@
  */
 
 import React, { useState } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { FinanceProvider, useFinance } from './context/FinanceContext';
+import { AlertCircle, X } from 'lucide-react';
 import { Header } from './components/Header';
 import { OfflineBanner } from './components/OfflineBanner';
 import { MobileBottomNav } from './components/MobileBottomNav';
@@ -23,6 +24,7 @@ import { Transaction, Budget, SavingsGoal } from './types';
 
 function MainAppShell() {
   const { activeTab } = useFinance();
+  const { error: authError, clearError } = useAuth();
 
   // Modals state
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
@@ -125,6 +127,18 @@ function MainAppShell() {
       <MobileBottomNav onOpenAddModal={handleOpenAddTransaction} />
 
       {/* Modals */}
+      {authError && (
+        <div className="fixed bottom-20 md:bottom-6 right-6 z-50 max-w-sm p-4 rounded-2xl bg-slate-900 border border-amber-500/30 text-amber-300 text-xs shadow-2xl flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-semibold text-white">Authentication Notice</p>
+            <p className="mt-0.5 text-slate-300">{authError}</p>
+          </div>
+          <button onClick={clearError} className="text-slate-400 hover:text-white">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       <TransactionModal
         isOpen={isTxModalOpen}
         onClose={() => setIsTxModalOpen(false)}

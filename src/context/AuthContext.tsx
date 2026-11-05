@@ -50,6 +50,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async () => {
     setError(null);
+    if (!isFirebaseConfigured || !auth) {
+      setError('Firebase configuration is required for cloud Google Sign-In.');
+      return;
+    }
     try {
       const loggedUser = await signInWithGoogle();
       if (loggedUser) {
@@ -58,16 +62,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('smart_expense_is_guest');
       }
     } catch (err: any) {
-      console.error('Google Sign-In failed', err);
-      // Clean readable error
-      if (err.code === 'auth/popup-closed-by-user') {
+      // User-friendly error message without unhandled exception
+      if (err?.code === 'auth/popup-closed-by-user') {
         setError('Sign-in popup was closed before completing.');
-      } else if (err.code === 'auth/cancelled-popup-request') {
+      } else if (err?.code === 'auth/cancelled-popup-request') {
         setError('Sign-in cancelled.');
       } else {
-        setError(err.message || 'Google Sign-In failed. Please check your network and configuration.');
+        setError(err?.message || 'Google Sign-In encountered an error. Please try again.');
       }
-      throw err;
     }
   };
 

@@ -86,8 +86,24 @@ export interface FirebaseConfig {
   firestoreDatabaseId?: string;
 }
 
+import appletConfig from '../../firebase-applet-config.json';
+
 export function getLoadedFirebaseConfig(): FirebaseConfig | null {
-  // Check env vars first
+  // Check provisioned applet config first
+  if (appletConfig && appletConfig.apiKey && appletConfig.projectId && appletConfig.projectId !== 'remixed-project-id') {
+    return {
+      apiKey: appletConfig.apiKey,
+      authDomain: appletConfig.authDomain,
+      projectId: appletConfig.projectId,
+      storageBucket: appletConfig.storageBucket,
+      messagingSenderId: appletConfig.messagingSenderId,
+      appId: appletConfig.appId,
+      measurementId: appletConfig.measurementId,
+      firestoreDatabaseId: appletConfig.firestoreDatabaseId || undefined,
+    };
+  }
+
+  // Check env vars next
   const envConfig: FirebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
@@ -150,6 +166,14 @@ export function initFirebase(customConfig?: FirebaseConfig): { app: FirebaseApp;
 
 // Initial attempt to bootstrap
 initFirebase();
+
+if (db) {
+  getDocFromServer(doc(db, 'test', 'connection')).catch((error) => {
+    if (error instanceof Error && error.message.includes('the client is offline')) {
+      console.warn('Firebase client is offline or network is unreachable.');
+    }
+  });
+}
 
 export { app, auth, db };
 

@@ -65,8 +65,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddModal, onOpenIOSGuide }
               onClick={() => setActiveTab('dashboard')}
               className="flex items-center gap-2.5 text-left focus:outline-none group"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition">
-                <Wallet className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center p-1 shadow-lg shadow-emerald-500/10 group-hover:scale-105 group-hover:border-emerald-500/30 transition overflow-hidden">
+                <img
+                  src="/assets/aistudio/calculation_e775ab51.png"
+                  alt="Smart Expense Manager Logo"
+                  className="w-full h-full object-contain filter drop-shadow"
+                />
               </div>
               <div>
                 <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-emerald-400 bg-clip-text text-transparent block">
