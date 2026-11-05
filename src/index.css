@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html.light {
+    color-scheme: light;
+  }
+
+  html.light body {
+    background-color: #f8fafc;
+    color: #0f172a;
+  }
+
+  html.light header {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-color: #e2e8f0;
+    color: #0f172a;
+  }
+
+  html.light aside {
+    background-color: rgba(241, 245, 249, 0.95);
+    border-color: #e2e8f0;
+  }
+
+  html.light .bg-slate-900 {
+    background-color: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  html.light .bg-slate-950 {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+  }
+
+  html.light .bg-slate-950\/70,
+  html.light .bg-slate-950\/95 {
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+  }
+
+  html.light .border-slate-800,
+  html.light .border-slate-800\/80,
+  html.light .border-slate-800\/70,
+  html.light .border-slate-800\/40,
+  html.light .divide-slate-800\/80 > :not([hidden]) ~ :not([hidden]),
+  html.light .divide-slate-800\/70 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #e2e8f0;
+  }
+
+  html.light .text-white {
+    color: #0f172a;
+  }
+
+  html.light .text-slate-200 {
+    color: #1e293b;
+  }
+
+  html.light .text-slate-300 {
+    color: #334155;
+  }
+
+  html.light .text-slate-400 {
+    color: #64748b;
+  }
+
+  html.light .bg-slate-800 {
+    background-color: #e2e8f0;
+    color: #1e293b;
+  }
+
+  html.light .bg-slate-800\/40:hover {
+    background-color: #f1f5f9;
+  }
+
+  html.light input,
+  html.light select,
+  html.light textarea {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+  }
+}
+
+/* Safe area insets for iOS PWA standalone mode */
+.safe-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}

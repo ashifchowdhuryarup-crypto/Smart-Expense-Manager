@@ -1,0 +1,6 @@
+{
+  "name": "Smart Expense Manager",
+  "description": "Cross-device personal finance tracker with Firebase Google Sign-In, Firestore cloud sync, IndexedDB offline storage, PWA support, category budgets, savings goals, and analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
