@@ -35,7 +35,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onOpenIOSGuide }) =>
     budgets,
     savingsGoals,
     importData,
-    resetToDemoData,
+    clearAllData,
     pendingSyncCount,
     triggerSyncNow,
     isSyncing,
@@ -452,14 +452,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onOpenIOSGuide }) =>
 
           <button
             onClick={() => {
-              if (window.confirm('Reset all financial data back to starter demo transactions?')) {
-                resetToDemoData();
+              if (window.confirm('Are you sure you want to permanently delete all financial records, budgets, and savings goals?')) {
+                clearAllData();
               }
             }}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-xs font-semibold text-rose-400 hover:text-rose-300 border border-slate-700 hover:border-rose-500/30 transition"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Reset to Demo Data
+            Clear All Data
           </button>
         </div>
       </div>

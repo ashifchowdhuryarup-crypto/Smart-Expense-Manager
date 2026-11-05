@@ -24,6 +24,7 @@ import {
   getSyncQueue,
   removeSyncQueueItem,
   clearSyncQueue,
+  clearAllLocalData,
 } from '../services/indexedDB';
 import {
   db,
@@ -38,7 +39,6 @@ import {
   subscribeToUserGoals,
 } from '../services/firebase';
 import { useAuth } from './AuthContext';
-import { getInitialDemoData } from '../utils/currency';
 
 interface FinanceContextType {
   transactions: Transaction[];
@@ -64,7 +64,7 @@ interface FinanceContextType {
   addGoalContribution: (goalId: string, amount: number) => Promise<void>;
   triggerSyncNow: () => Promise<void>;
   importData: (data: { transactions?: Transaction[]; budgets?: Budget[]; goals?: SavingsGoal[] }) => Promise<void>;
-  resetToDemoData: () => Promise<void>;
+  clearAllData: () => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -175,22 +175,32 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           getLocalSavingsGoals(user?.uid),
         ]);
 
-        if (localTxs.length === 0 && !user) {
-          // Populate with initial demo financial records if completely empty
-          const seed = getInitialDemoData('demo-user');
-          setTransactions(seed.transactions);
-          setBudgets(seed.budgets);
-          setSavingsGoals(seed.goals);
+        // Filter out any legacy demo records
+        const cleanTxs = localTxs.filter(
+          (t) => t.userId !== 'demo-user' && !t.id.match(/^tx-[1-7]$/)
+        );
+        const cleanBgs = localBgs.filter(
+          (b) => b.userId !== 'demo-user' && !b.id.match(/^bg-[1-4]$/)
+        );
+        const cleanSgs = localSgs.filter(
+          (g) => g.userId !== 'demo-user' && !g.id.match(/^sg-[1-3]$/)
+        );
+
+        if (
+          cleanTxs.length !== localTxs.length ||
+          cleanBgs.length !== localBgs.length ||
+          cleanSgs.length !== localSgs.length
+        ) {
           await Promise.all([
-            saveAllLocalTransactions(seed.transactions),
-            saveAllLocalBudgets(seed.budgets),
-            saveAllLocalSavingsGoals(seed.goals),
+            saveAllLocalTransactions(cleanTxs),
+            saveAllLocalBudgets(cleanBgs),
+            saveAllLocalSavingsGoals(cleanSgs),
           ]);
-        } else {
-          setTransactions(localTxs);
-          setBudgets(localBgs);
-          setSavingsGoals(localSgs);
         }
+
+        setTransactions(cleanTxs);
+        setBudgets(cleanBgs);
+        setSavingsGoals(cleanSgs);
 
         await refreshPendingCount();
         initialLoadedRef.current = true;
@@ -512,17 +522,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const resetToDemoData = async (): Promise<void> => {
-    const seed = getInitialDemoData(currentUserId);
-    setTransactions(seed.transactions);
-    setBudgets(seed.budgets);
-    setSavingsGoals(seed.goals);
-    await Promise.all([
-      saveAllLocalTransactions(seed.transactions),
-      saveAllLocalBudgets(seed.budgets),
-      saveAllLocalSavingsGoals(seed.goals),
-      clearSyncQueue(),
-    ]);
+  const clearAllData = async (): Promise<void> => {
+    setTransactions([]);
+    setBudgets([]);
+    setSavingsGoals([]);
+    await clearAllLocalData();
     setPendingSyncCount(0);
   };
 
@@ -552,7 +556,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addGoalContribution,
         triggerSyncNow,
         importData,
-        resetToDemoData,
+        clearAllData,
       }}
     >
       {children}

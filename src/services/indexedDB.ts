@@ -98,7 +98,7 @@ export async function getLocalTransactions(userId?: string): Promise<Transaction
       request.onsuccess = () => {
         let items: Transaction[] = request.result || [];
         if (userId) {
-          items = items.filter(t => t.userId === userId || t.userId === 'demo-user');
+          items = items.filter(t => t.userId === userId);
         }
         resolve(items);
       };
@@ -157,7 +157,7 @@ export async function getLocalBudgets(userId?: string): Promise<Budget[]> {
       request.onsuccess = () => {
         let items: Budget[] = request.result || [];
         if (userId) {
-          items = items.filter(b => b.userId === userId || b.userId === 'demo-user');
+          items = items.filter(b => b.userId === userId);
         }
         resolve(items);
       };
@@ -214,7 +214,7 @@ export async function getLocalSavingsGoals(userId?: string): Promise<SavingsGoal
       request.onsuccess = () => {
         let items: SavingsGoal[] = request.result || [];
         if (userId) {
-          items = items.filter(g => g.userId === userId || g.userId === 'demo-user');
+          items = items.filter(g => g.userId === userId);
         }
         resolve(items);
       };
@@ -320,3 +320,21 @@ export async function clearSyncQueue(): Promise<void> {
     localStorage.removeItem('smart_expense_sync_queue');
   }
 }
+
+export async function clearAllLocalData(): Promise<void> {
+  try {
+    const db = await getDB();
+    const storeNames = ['transactions', 'budgets', 'savingsGoals', 'settings', 'syncQueue'];
+    const tx = db.transaction(storeNames, 'readwrite');
+    for (const name of storeNames) {
+      tx.objectStore(name).clear();
+    }
+  } catch (e) {
+    console.warn('Failed clearing IndexedDB', e);
+  }
+  localStorage.removeItem('smart_expense_transactions');
+  localStorage.removeItem('smart_expense_budgets');
+  localStorage.removeItem('smart_expense_goals');
+  localStorage.removeItem('smart_expense_sync_queue');
+}
+
