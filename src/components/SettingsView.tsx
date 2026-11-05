@@ -193,6 +193,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onOpenIOSGuide }) =>
               {activeFirebaseConfig?.authDomain || 'None'}
             </span>
           </div>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400">Current App Domain:</span>
+            <div className="flex items-center gap-1.5 font-mono text-emerald-400">
+              <span className="truncate max-w-[220px] sm:max-w-none">{typeof window !== 'undefined' ? window.location.hostname : 'localhost'}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    navigator.clipboard.writeText(window.location.hostname);
+                  }
+                }}
+                title="Copy Domain"
+                className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 transition"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
           <div className="flex justify-between">
             <span className="text-slate-400">Offline Queue:</span>
             <span className="text-slate-200 font-semibold">

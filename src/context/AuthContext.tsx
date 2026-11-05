@@ -69,8 +69,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setError('Sign-in cancelled.');
       } else if (err?.code === 'auth/popup-blocked') {
         setError('Popup was blocked by your browser. Please allow popups for this site or open in a new tab.');
-      } else if (err?.code === 'auth/unauthorized-domain') {
-        setError('Domain not authorized in Firebase Console. Add your current URL under Firebase Console > Authentication > Settings > Authorized domains.');
+      } else if (err?.code === 'auth/unauthorized-domain' || err?.message?.includes('auth/unauthorized-domain')) {
+        const domain = typeof window !== 'undefined' ? window.location.hostname : '';
+        setError(`Unauthorized Domain: '${domain}' is not authorized in Firebase. To fix this, add '${domain}' to Firebase Console > Authentication > Settings > Authorized Domains.`);
       } else {
         setError(err?.message || 'Google Sign-In encountered an error. Please try again.');
       }

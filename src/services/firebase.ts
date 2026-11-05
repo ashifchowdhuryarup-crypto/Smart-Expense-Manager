@@ -202,8 +202,22 @@ export async function signInWithGoogle(): Promise<User | null> {
   }
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
-  const result = await signInWithPopup(auth, provider);
-  return result.user;
+  try {
+    const result = await signInWithPopup(auth, provider);
+    return result.user;
+  } catch (error: any) {
+    const errorCode = error?.code || '';
+    const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
+    if (errorCode === 'auth/unauthorized-domain') {
+      const err = new Error(
+        `Firebase Error: auth/unauthorized-domain. Domain "${currentHost}" is not yet in the Firebase Authorized Domains list. Please add "${currentHost}" under Firebase Console -> Authentication -> Settings -> Authorized domains.`
+      );
+      (err as any).code = 'auth/unauthorized-domain';
+      (err as any).domain = currentHost;
+      throw err;
+    }
+    throw error;
+  }
 }
 
 export async function signOutUser(): Promise<void> {
