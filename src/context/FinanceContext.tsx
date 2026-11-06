@@ -114,19 +114,25 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         try {
           if (item.collection === 'transactions') {
             if (item.action === 'create' || item.action === 'update') {
-              await syncTransactionToFirestore(user.uid, item.data);
+              const txToSync = { ...item.data, userId: user.uid };
+              await syncTransactionToFirestore(user.uid, txToSync);
+              await saveLocalTransaction({ ...txToSync, syncedToCloud: true });
             } else if (item.action === 'delete') {
               await deleteTransactionFromFirestore(user.uid, item.data.id);
             }
           } else if (item.collection === 'budgets') {
             if (item.action === 'create' || item.action === 'update') {
-              await syncBudgetToFirestore(user.uid, item.data);
+              const bgToSync = { ...item.data, userId: user.uid };
+              await syncBudgetToFirestore(user.uid, bgToSync);
+              await saveLocalBudget(bgToSync);
             } else if (item.action === 'delete') {
               await deleteBudgetFromFirestore(user.uid, item.data.id);
             }
           } else if (item.collection === 'savingsGoals') {
             if (item.action === 'create' || item.action === 'update') {
-              await syncSavingsGoalToFirestore(user.uid, item.data);
+              const sgToSync = { ...item.data, userId: user.uid };
+              await syncSavingsGoalToFirestore(user.uid, sgToSync);
+              await saveLocalSavingsGoal(sgToSync);
             } else if (item.action === 'delete') {
               await deleteSavingsGoalFromFirestore(user.uid, item.data.id);
             }

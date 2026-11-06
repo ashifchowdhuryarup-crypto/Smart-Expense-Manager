@@ -44,8 +44,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top Welcome & Quick Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Top Welcome & Desktop Action */}
+      <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white">Financial Dashboard</h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -53,15 +53,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onOpenAddTransaction}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 transition active:scale-95"
-          >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
-            New Transaction
-          </button>
-        </div>
+        {/* Visible on Desktop/Tablet, hidden on mobile */}
+        <button
+          onClick={onOpenAddTransaction}
+          className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 transition active:scale-95"
+        >
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <span>New Transaction</span>
+        </button>
       </div>
 
       {/* 4 Summary Cards */}

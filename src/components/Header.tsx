@@ -131,22 +131,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddModal, onOpenIOSGuide }
             {!isInstalled && isInstallable && (
               <button
                 onClick={install}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition"
                 title="Install Smart Expense as desktop or mobile app"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Install App</span>
+                <span className="hidden xs:inline sm:inline">Install</span>
               </button>
             )}
 
             {!isInstalled && isIOS && (
               <button
                 onClick={onOpenIOSGuide}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition"
                 title="Install on iPhone / iPad"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Install on iOS</span>
+                <span className="hidden xs:inline sm:inline">Install</span>
               </button>
             )}
 
@@ -226,13 +226,27 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddModal, onOpenIOSGuide }
               </button>
             )}
 
-            {/* Quick Add Transaction Button */}
+            {/* Settings button in top header */}
+            <button
+              onClick={() => setActiveTab('settings')}
+              aria-label="Settings and Preferences"
+              className={`p-2 rounded-lg transition ${
+                activeTab === 'settings'
+                  ? 'bg-emerald-500/15 text-emerald-400'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+              }`}
+              title="Settings"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+
+            {/* Desktop Add Transaction Button (visible on md+ desktop screens, hidden on mobile) */}
             <button
               onClick={onOpenAddModal}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition active:scale-95"
+              className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
-              <span className="hidden sm:inline">Add Transaction</span>
+              <span>Add Transaction</span>
             </button>
           </div>
         </div>
