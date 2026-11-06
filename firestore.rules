@@ -26,23 +26,12 @@ service cloud.firestore {
       // Transactions subcollection
       match /transactions/{transactionId} {
         allow read: if isOwner(userId);
-        allow create: if isOwner(userId) 
+        allow create, update: if isOwner(userId)
           && isValidId(transactionId)
           && request.resource.data.userId == userId
           && request.resource.data.amount is number
           && request.resource.data.amount > 0
-          && request.resource.data.type in ['income', 'expense']
-          && request.resource.data.category is string
-          && request.resource.data.category.size() <= 64
-          && request.resource.data.description is string
-          && request.resource.data.description.size() <= 256;
-        
-        allow update: if isOwner(userId)
-          && request.resource.data.userId == userId
-          && request.resource.data.amount is number
-          && request.resource.data.amount > 0
           && request.resource.data.type in ['income', 'expense'];
-
         allow delete: if isOwner(userId);
       }
 

@@ -128,14 +128,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAddModal, onOpenIOSGuide }
           {/* Right Action Icons & Controls */}
           <div className="flex items-center gap-2">
             {/* PWA Install Button */}
-            {!isInstalled && isInstallable && (
+            {!isInstalled && (
               <button
-                onClick={install}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition"
-                title="Install Smart Expense as desktop or mobile app"
+                onClick={() => {
+                  if (isInstallable) {
+                    install();
+                  } else {
+                    onOpenIOSGuide();
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition shadow-sm"
+                title="Install Smart Expense as standalone Desktop or Mobile App"
               >
-                <Download className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline sm:inline">Install</span>
+                <Download className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Install App</span>
               </button>
             )}
 

@@ -176,9 +176,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     async function loadData() {
       try {
         const [localTxs, localBgs, localSgs] = await Promise.all([
-          getLocalTransactions(user?.uid),
-          getLocalBudgets(user?.uid),
-          getLocalSavingsGoals(user?.uid),
+          getLocalTransactions(),
+          getLocalBudgets(),
+          getLocalSavingsGoals(),
         ]);
 
         // Filter out any legacy demo records
@@ -243,8 +243,21 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         saveAllLocalSavingsGoals(remoteGoals);
       });
 
-      // Flush any queued offline changes
-      flushSyncQueue();
+      // Flush any queued offline changes and migrate local records to cloud
+      (async () => {
+        try {
+          const localTxs = await getLocalTransactions();
+          const unSyncedTxs = localTxs.filter(t => !t.syncedToCloud || t.userId !== user.uid);
+          for (const tx of unSyncedTxs) {
+            const stamped = { ...tx, userId: user.uid, syncedToCloud: true };
+            await syncTransactionToFirestore(user.uid, stamped);
+            await saveLocalTransaction(stamped);
+          }
+        } catch (migErr) {
+          console.warn('Auto-migration note:', migErr);
+        }
+        await flushSyncQueue();
+      })();
     } catch (e) {
       console.warn('Real-time listener setup error', e);
     }

@@ -231,12 +231,23 @@ export async function syncTransactionToFirestore(userId: string, tx: Transaction
   if (!db) return;
   const docPath = `users/${userId}/transactions/${tx.id}`;
   try {
-    await setDoc(doc(db, 'users', userId, 'transactions', tx.id), {
-      ...tx,
+    const payload: Record<string, any> = {
+      id: tx.id,
       userId,
+      type: tx.type,
+      amount: Number(tx.amount),
+      category: tx.category || 'General',
+      description: tx.description || 'Transaction',
+      date: tx.date,
+      paymentMethod: tx.paymentMethod || 'Cash',
       syncedToCloud: true,
+      createdAt: tx.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    });
+    };
+    if (tx.notes !== undefined) payload.notes = tx.notes;
+    if (tx.tags !== undefined) payload.tags = tx.tags;
+
+    await setDoc(doc(db, 'users', userId, 'transactions', tx.id), payload);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, docPath, auth);
   }
