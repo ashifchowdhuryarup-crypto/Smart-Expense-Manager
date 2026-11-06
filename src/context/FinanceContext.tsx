@@ -228,25 +228,19 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     try {
       unsubTxs = subscribeToUserTransactions(user.uid, (remoteTxs) => {
-        if (remoteTxs.length > 0) {
-          setTransactions(remoteTxs);
-          saveAllLocalTransactions(remoteTxs);
-          setLastSyncTime(new Date());
-        }
+        setTransactions(remoteTxs);
+        saveAllLocalTransactions(remoteTxs);
+        setLastSyncTime(new Date());
       });
 
       unsubBudgets = subscribeToUserBudgets(user.uid, (remoteBudgets) => {
-        if (remoteBudgets.length > 0) {
-          setBudgets(remoteBudgets);
-          saveAllLocalBudgets(remoteBudgets);
-        }
+        setBudgets(remoteBudgets);
+        saveAllLocalBudgets(remoteBudgets);
       });
 
       unsubGoals = subscribeToUserGoals(user.uid, (remoteGoals) => {
-        if (remoteGoals.length > 0) {
-          setSavingsGoals(remoteGoals);
-          saveAllLocalSavingsGoals(remoteGoals);
-        }
+        setSavingsGoals(remoteGoals);
+        saveAllLocalSavingsGoals(remoteGoals);
       });
 
       // Flush any queued offline changes
@@ -295,7 +289,8 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         });
         await refreshPendingCount();
       }
-    } else if (user) {
+    } else {
+      // Offline or Guest mode: queue item so that once user logs in or reconnects, it immediately syncs to Firestore
       await enqueueSyncItem({
         collection: 'transactions',
         action: 'create',
