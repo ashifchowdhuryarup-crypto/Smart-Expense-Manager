@@ -85,8 +85,20 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
 
       return true;
     }).sort((a, b) => {
-      if (sortBy === 'dateDesc') return b.date.localeCompare(a.date);
-      if (sortBy === 'dateAsc') return a.date.localeCompare(b.date);
+      if (sortBy === 'dateDesc') {
+        const dateComp = (b.date || '').localeCompare(a.date || '');
+        if (dateComp !== 0) return dateComp;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        return timeB - timeA;
+      }
+      if (sortBy === 'dateAsc') {
+        const dateComp = (a.date || '').localeCompare(b.date || '');
+        if (dateComp !== 0) return dateComp;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        return timeA - timeB;
+      }
       if (sortBy === 'amountDesc') return b.amount - a.amount;
       if (sortBy === 'amountAsc') return a.amount - b.amount;
       return 0;

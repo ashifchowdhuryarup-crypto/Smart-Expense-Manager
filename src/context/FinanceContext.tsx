@@ -192,6 +192,15 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           (g) => g.userId !== 'demo-user' && !g.id.match(/^sg-[1-3]$/)
         );
 
+        // Sort newest first: primary by date (desc), secondary by createdAt (desc)
+        cleanTxs.sort((a, b) => {
+          const dateComp = (b.date || '').localeCompare(a.date || '');
+          if (dateComp !== 0) return dateComp;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          return timeB - timeA;
+        });
+
         if (
           cleanTxs.length !== localTxs.length ||
           cleanBgs.length !== localBgs.length ||
@@ -282,8 +291,17 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       syncedToCloud: false,
     };
 
-    // Optimistic local update
-    setTransactions((prev) => [newTx, ...prev]);
+    // Optimistic local update: ensure new transactions stay at the very top
+    setTransactions((prev) => {
+      const updated = [newTx, ...prev.filter((t) => t.id !== newTx.id)];
+      return updated.sort((a, b) => {
+        const dateComp = (b.date || '').localeCompare(a.date || '');
+        if (dateComp !== 0) return dateComp;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        return timeB - timeA;
+      });
+    });
     await saveLocalTransaction(newTx);
 
     // Sync to Firestore or Queue

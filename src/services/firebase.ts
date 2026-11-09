@@ -341,6 +341,14 @@ export function subscribeToUserTransactions(
       snapshot.forEach((doc) => {
         items.push({ ...(doc.data() as Transaction), id: doc.id });
       });
+      // Sort newest first by date and createdAt
+      items.sort((a, b) => {
+        const dateComp = (b.date || '').localeCompare(a.date || '');
+        if (dateComp !== 0) return dateComp;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        return timeB - timeA;
+      });
       onData(items);
     },
     (error) => {

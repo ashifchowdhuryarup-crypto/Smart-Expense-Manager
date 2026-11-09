@@ -15,6 +15,8 @@ import {
   Smartphone,
   ShieldCheck,
   ExternalLink,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { useAuth } from '../context/AuthContext';
@@ -44,7 +46,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onOpenIOSGuide }) =>
   } = useFinance();
 
   const { user, isFirebaseConfigured, signIn, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, setTheme } = useTheme();
   const { isInstallable, isInstalled, install, isIOS } = usePWAInstall();
 
   const [testingConnection, setTestingConnection] = useState(false);
@@ -379,25 +381,27 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onOpenIOSGuide }) =>
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => toggleTheme()}
-                className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-semibold transition ${
+                onClick={() => setTheme('dark')}
+                className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
                   theme === 'dark'
-                    ? 'bg-slate-950 border-emerald-500/50 text-emerald-400'
-                    : 'bg-slate-800 border-slate-700 text-slate-300'
+                    ? 'bg-slate-950 border-emerald-500 text-emerald-400 ring-1 ring-emerald-500/30 shadow-sm'
+                    : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                 }`}
               >
-                Dark Mode
+                <Moon className="w-3.5 h-3.5" />
+                <span>Dark Mode</span>
               </button>
               <button
                 type="button"
-                onClick={() => toggleTheme()}
-                className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-semibold transition ${
+                onClick={() => setTheme('light')}
+                className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
                   theme === 'light'
-                    ? 'bg-slate-950 border-emerald-500/50 text-emerald-400'
-                    : 'bg-slate-800 border-slate-700 text-slate-300'
+                    ? 'bg-slate-950 border-emerald-500 text-emerald-400 ring-1 ring-emerald-500/30 shadow-sm'
+                    : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                 }`}
               >
-                Light Mode
+                <Sun className="w-3.5 h-3.5" />
+                <span>Light Mode</span>
               </button>
             </div>
           </div>

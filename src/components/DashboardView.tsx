@@ -38,9 +38,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const currentMonth = getCurrentYearMonth();
   const summary = calculateFinancialSummary(transactions);
 
-  // Month transactions
+  // Month transactions and Recent Transactions (guaranteed newest first)
   const monthTransactions = transactions.filter((t) => t.date.startsWith(currentMonth));
-  const recentTransactions = transactions.slice(0, 6);
+  const recentTransactions = [...transactions]
+    .sort((a, b) => {
+      const dateComp = (b.date || '').localeCompare(a.date || '');
+      if (dateComp !== 0) return dateComp;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      return timeB - timeA;
+    })
+    .slice(0, 6);
 
   return (
     <div className="space-y-6">

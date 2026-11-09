@@ -54,15 +54,22 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
             </ol>
           </div>
 
-          {/* Android / Windows Chrome / Edge Guide */}
+          {/* Android WebAPK & Mobile Guide */}
           <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
             <h4 className="font-semibold text-sm text-slate-200 flex items-center gap-2">
-              <Monitor className="w-4 h-4 text-emerald-400" />
-              Windows, Mac & Android (Chrome / Edge)
+              <Smartphone className="w-4 h-4 text-emerald-400" />
+              Android Phone (Automatic WebAPK / Install)
             </h4>
-            <p className="text-slate-300 leading-relaxed">
-              Click the install icon in the URL address bar or click the button below to install directly to your device desktop or home screen.
-            </p>
+            <div className="space-y-1.5 text-slate-300 leading-relaxed text-[11px]">
+              <p>
+                Chrome automatically generates a secure, signed <strong className="text-emerald-400">Android WebAPK</strong> package on your device:
+              </p>
+              <ol className="list-decimal list-inside space-y-1 pl-1">
+                <li>Tap Chrome's top-right <strong className="text-white">3 dots (⋮)</strong> menu.</li>
+                <li>Tap <strong className="text-white">"Install app"</strong> or <strong className="text-white">"Add to Home Screen"</strong>.</li>
+                <li>Chrome compiles and installs the app as an Android Application with its own launcher icon, splash screen, and offline support.</li>
+              </ol>
+            </div>
             {isInstallable && (
               <button
                 onClick={async () => {
@@ -72,7 +79,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
                 className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                Prompt Install Now
+                Install WebAPK to Android Now
               </button>
             )}
           </div>
