@@ -31,7 +31,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Update meta theme-color for PWA status bar
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute('content', theme === 'dark' ? '#0b1020' : '#ffffff');
+      metaTheme.setAttribute('content', theme === 'dark' ? '#060d0b' : '#f6f7f4');
     }
   }, [theme]);
 

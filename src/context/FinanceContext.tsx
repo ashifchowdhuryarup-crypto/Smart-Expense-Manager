@@ -39,6 +39,7 @@ import {
   subscribeToUserGoals,
 } from '../services/firebase';
 import { useAuth } from './AuthContext';
+import { sortTransactionsNewestFirst } from '../utils/currency';
 
 interface FinanceContextType {
   transactions: Transaction[];
@@ -192,28 +193,21 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           (g) => g.userId !== 'demo-user' && !g.id.match(/^sg-[1-3]$/)
         );
 
-        // Sort newest first: primary by date (desc), secondary by createdAt (desc)
-        cleanTxs.sort((a, b) => {
-          const dateComp = (b.date || '').localeCompare(a.date || '');
-          if (dateComp !== 0) return dateComp;
-          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          return timeB - timeA;
-        });
+        const sortedTxs = sortTransactionsNewestFirst(cleanTxs);
 
         if (
-          cleanTxs.length !== localTxs.length ||
+          sortedTxs.length !== localTxs.length ||
           cleanBgs.length !== localBgs.length ||
           cleanSgs.length !== localSgs.length
         ) {
           await Promise.all([
-            saveAllLocalTransactions(cleanTxs),
+            saveAllLocalTransactions(sortedTxs),
             saveAllLocalBudgets(cleanBgs),
             saveAllLocalSavingsGoals(cleanSgs),
           ]);
         }
 
-        setTransactions(cleanTxs);
+        setTransactions(sortedTxs);
         setBudgets(cleanBgs);
         setSavingsGoals(cleanSgs);
 
@@ -237,8 +231,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     try {
       unsubTxs = subscribeToUserTransactions(user.uid, (remoteTxs) => {
-        setTransactions(remoteTxs);
-        saveAllLocalTransactions(remoteTxs);
+        const sorted = sortTransactionsNewestFirst(remoteTxs);
+        setTransactions(sorted);
+        saveAllLocalTransactions(sorted);
         setLastSyncTime(new Date());
       });
 
@@ -292,16 +287,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
 
     // Optimistic local update: ensure new transactions stay at the very top
-    setTransactions((prev) => {
-      const updated = [newTx, ...prev.filter((t) => t.id !== newTx.id)];
-      return updated.sort((a, b) => {
-        const dateComp = (b.date || '').localeCompare(a.date || '');
-        if (dateComp !== 0) return dateComp;
-        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        return timeB - timeA;
-      });
-    });
+    setTransactions((prev) =>
+      sortTransactionsNewestFirst([newTx, ...prev.filter((t) => t.id !== newTx.id)])
+    );
     await saveLocalTransaction(newTx);
 
     // Sync to Firestore or Queue
@@ -541,8 +529,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     goals?: SavingsGoal[];
   }): Promise<void> => {
     if (data.transactions && data.transactions.length > 0) {
-      setTransactions(data.transactions);
-      await saveAllLocalTransactions(data.transactions);
+      const sorted = sortTransactionsNewestFirst(data.transactions);
+      setTransactions(sorted);
+      await saveAllLocalTransactions(sorted);
     }
     if (data.budgets && data.budgets.length > 0) {
       setBudgets(data.budgets);

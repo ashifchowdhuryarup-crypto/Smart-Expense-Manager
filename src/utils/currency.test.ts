@@ -5,6 +5,7 @@ import {
   calculateFinancialSummary,
   calculateBudgetProgress,
   CURRENCY_SYMBOLS,
+  sortTransactionsNewestFirst,
 } from './currency';
 import { Transaction, Budget } from '../types';
 
@@ -141,4 +142,51 @@ test('calculateBudgetProgress accurately marks within budget vs near limit vs ov
   assert.equal(progress3.spent, 10500);
   assert.equal(progress3.isOver, true);
   assert.equal(progress3.remaining, -500);
+});
+
+test('sortTransactionsNewestFirst always places newly added transactions at the top', () => {
+  const olderButFutureDate: Transaction = {
+    id: 'tx_1700000000000_old',
+    userId: 'u1',
+    type: 'expense',
+    amount: 500,
+    category: 'Food & Dining',
+    description: 'Older entry with future date',
+    date: '2026-12-30',
+    paymentMethod: 'Cash',
+    createdAt: '2026-11-10T10:00:00.000Z',
+    updatedAt: '2026-11-10T10:00:00.000Z',
+  };
+
+  const firstNewToday: Transaction = {
+    id: 'tx_1794930000000_one',
+    userId: 'u1',
+    type: 'expense',
+    amount: 250,
+    category: 'Transportation',
+    description: 'First new expense',
+    date: '2026-11-17',
+    paymentMethod: 'bKash',
+    createdAt: '2026-11-17T08:00:00.000Z',
+    updatedAt: '2026-11-17T08:00:00.000Z',
+  };
+
+  const latestNewPastReceipt: Transaction = {
+    id: 'tx_1794930060000_two',
+    userId: 'u1',
+    type: 'expense',
+    amount: 900,
+    category: 'Groceries',
+    description: 'Latest added expense (yesterday receipt)',
+    date: '2026-11-16',
+    paymentMethod: 'Nagad',
+    createdAt: '2026-11-17T08:05:00.000Z',
+    updatedAt: '2026-11-17T08:05:00.000Z',
+  };
+
+  const sorted = sortTransactionsNewestFirst([olderButFutureDate, firstNewToday, latestNewPastReceipt]);
+  assert.deepEqual(
+    sorted.map((t) => t.id),
+    ['tx_1794930060000_two', 'tx_1794930000000_one', 'tx_1700000000000_old']
+  );
 });

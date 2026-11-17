@@ -10,6 +10,8 @@ export type PaymentMethod =
   | 'Rocket' 
   | 'Other';
 
+export type RecurringFrequency = 'weekly' | 'monthly' | 'yearly';
+
 export interface Transaction {
   id: string;
   userId: string;
@@ -19,6 +21,9 @@ export interface Transaction {
   description: string;
   date: string; // ISO date format YYYY-MM-DD
   paymentMethod: PaymentMethod;
+  isRecurring?: boolean;
+  recurringFrequency?: RecurringFrequency;
+  clientProject?: string;
   notes?: string;
   tags?: string[];
   createdAt: string;

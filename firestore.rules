@@ -31,7 +31,10 @@ service cloud.firestore {
           && request.resource.data.userId == userId
           && request.resource.data.amount is number
           && request.resource.data.amount > 0
-          && request.resource.data.type in ['income', 'expense'];
+          && request.resource.data.type in ['income', 'expense']
+          && (!('isRecurring' in request.resource.data) || request.resource.data.isRecurring is bool)
+          && (!('recurringFrequency' in request.resource.data) || request.resource.data.recurringFrequency in ['weekly', 'monthly', 'yearly'])
+          && (!('clientProject' in request.resource.data) || (request.resource.data.clientProject is string && request.resource.data.clientProject.size() <= 128));
         allow delete: if isOwner(userId);
       }
 

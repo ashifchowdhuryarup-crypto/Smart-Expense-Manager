@@ -20,6 +20,7 @@ import {
   Unsubscribe,
 } from 'firebase/firestore';
 import { Transaction, Budget, SavingsGoal, UserSettings } from '../types';
+import { sortTransactionsNewestFirst } from '../utils/currency';
 
 export enum OperationType {
   CREATE = 'create',
@@ -244,6 +245,9 @@ export async function syncTransactionToFirestore(userId: string, tx: Transaction
       createdAt: tx.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+    if (tx.isRecurring !== undefined) payload.isRecurring = Boolean(tx.isRecurring);
+    if (tx.isRecurring && tx.recurringFrequency) payload.recurringFrequency = tx.recurringFrequency;
+    if (tx.clientProject && tx.clientProject.trim()) payload.clientProject = tx.clientProject.trim();
     if (tx.notes !== undefined) payload.notes = tx.notes;
     if (tx.tags !== undefined) payload.tags = tx.tags;
 
@@ -338,18 +342,26 @@ export function subscribeToUserTransactions(
     q,
     (snapshot) => {
       const items: Transaction[] = [];
-      snapshot.forEach((doc) => {
-        items.push({ ...(doc.data() as Transaction), id: doc.id });
+      snapshot.forEach((docSnap) => {
+        const raw = docSnap.data() as Record<string, any>;
+        const normalizeIso = (val: unknown): string => {
+          if (typeof val === 'string') return val;
+          if (val && typeof (val as { toDate?: () => Date }).toDate === 'function') {
+            return (val as { toDate: () => Date }).toDate().toISOString();
+          }
+          if (val && typeof (val as { seconds?: number }).seconds === 'number') {
+            return new Date((val as { seconds: number }).seconds * 1000).toISOString();
+          }
+          return '';
+        };
+        items.push({
+          ...(raw as Transaction),
+          id: docSnap.id,
+          createdAt: normalizeIso(raw.createdAt) || raw.createdAt || '',
+          updatedAt: normalizeIso(raw.updatedAt) || raw.updatedAt || '',
+        });
       });
-      // Sort newest first by date and createdAt
-      items.sort((a, b) => {
-        const dateComp = (b.date || '').localeCompare(a.date || '');
-        if (dateComp !== 0) return dateComp;
-        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        return timeB - timeA;
-      });
-      onData(items);
+      onData(sortTransactionsNewestFirst(items));
     },
     (error) => {
       try {
